@@ -1,0 +1,18 @@
+{
+  "name": "Pembe Sudoku – Mediha Nur",
+  "short_name": "Pembe Sudoku",
+  "description": "Mediha Nur'un özel pembe sudoku oyunu",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffc2e0",
+  "theme_color": "#f472b6",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
