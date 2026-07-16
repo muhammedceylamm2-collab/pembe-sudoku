@@ -140,12 +140,36 @@
     .badge-hard    { background:#fee2e2; color:#dc2626; }
     .badge-extreme { background:#f3e8ff; color:#7c3aed; }
 
-    .stat-row { display: flex; gap: 6px; align-items: center; }
+    .stat-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .info-box {
       background: #fff0f7; border: 2px solid #f9a8d4; border-radius: 10px;
       padding: 4px 10px; color: #c0386a; font-weight: 700;
       font-size: clamp(0.75rem, 3vw, 0.9rem); white-space: nowrap;
     }
+    .score-box {
+      background: linear-gradient(135deg,#fce7f3,#fbcfe8);
+      border: 2px solid #f472b6; border-radius: 10px;
+      padding: 4px 12px; color: #be185d; font-weight: 800;
+      font-size: clamp(0.75rem, 3vw, 0.9rem); white-space: nowrap;
+      position: relative; overflow: hidden;
+    }
+
+    /* puan artış animasyonu */
+    .score-pop {
+      position: fixed; pointer-events: none; z-index: 998;
+      font-size: 1rem; font-weight: 900; color: #be185d;
+      animation: scorePop .7s ease-out forwards;
+    }
+    .score-pop.minus { color: #e11d48; }
+    @keyframes scorePop {
+      0%   { opacity:1; transform:translateY(0) scale(1.2); }
+      100% { opacity:0; transform:translateY(-40px) scale(0.8); }
+    }
+
+    /* win ekranı yıldızlar */
+    .win-stars { font-size: clamp(1.8rem,8vw,2.4rem); margin: 8px 0; letter-spacing: 4px; }
+    .win-score { font-size: clamp(1.4rem,6vw,1.9rem); font-weight: 900; color: #be185d; margin-bottom: 4px; }
+    .win-score-label { font-size: 0.78rem; color: #db7aa0; margin-bottom: 12px; }
 
     .top-bar {
       display: flex; align-items: center; justify-content: center;
@@ -362,6 +386,7 @@
     <div class="stat-row">
       <div class="info-box" id="timer">⏱ 00:00</div>
       <div class="info-box" id="mistakeBox">❌ 0/3</div>
+      <div class="score-box" id="scoreBox">⭐ 0</div>
     </div>
   </div>
 
@@ -404,6 +429,9 @@
     <span class="win-emoji" id="winEmoji">🎉</span>
     <h2>Tebrikler Mediha Nur!</h2>
     <p class="win-sub" id="winSub"></p>
+    <div class="win-stars" id="winStars"></div>
+    <div class="win-score" id="winScore"></div>
+    <div class="win-score-label" id="winScoreLabel"></div>
     <p id="winMsg"></p>
     <div class="win-btns">
       <button class="btn" id="winNewGame">Yeni Oyun</button>
@@ -505,14 +533,17 @@ function countSol(g,lim) {
 /* ════════════════════════════════
    STATE
 ════════════════════════════════ */
-const REMOVALS   = {easy:36,medium:46,hard:54,extreme:62};
-const DIFF_LABEL = {easy:'Kolay',medium:'Orta',hard:'Zor',extreme:'Ekstrem'};
-const DIFF_EMOJI = {easy:'🌱',medium:'🌷',hard:'🎀',extreme:'👑'};
+const REMOVALS    = {easy:36,medium:46,hard:54,extreme:62};
+const DIFF_LABEL  = {easy:'Kolay',medium:'Orta',hard:'Zor',extreme:'Ekstrem'};
+const DIFF_EMOJI  = {easy:'🌱',medium:'🌷',hard:'🎀',extreme:'👑'};
+const POINTS      = {easy:10,medium:20,hard:35,extreme:60};
+const PENALTY     = {easy:25,medium:50,hard:80,extreme:130};
+const TIME_BONUS  = {easy:300,medium:600,hard:1000,easy:300,extreme:1800};
 
 let solution, puzzle, userGrid, notes;
 let selectedCell=null, mistakes=0, timerInterval=null, seconds=0;
 let notesMode=false, difficulty='easy', gameOver=false;
-let correctCount=0; // toplam doğru yerleştirme sayısı
+let correctCount=0, score=0;
 
 /* ════════════════════════════════
    SCREENS
@@ -632,8 +663,11 @@ function inputNum(n) {
   if (n===solution[r][c]){
     userGrid[r][c]=n; clearPeerNotes(r,c,n);
     correctCount++;
+    const gained=POINTS[difficulty];
+    score+=gained;
+    updateScoreDisplay();
+    popScore(`+${gained}`, r, c, false);
     renderBoard(); selectCell(r,c);
-    // milestone mesajları
     const total=81-countGivens();
     if (correctCount===Math.floor(total*0.5)) showToast(rnd(MILESTONE_MSGS));
     else if (correctCount===Math.floor(total*0.8)) showToast('Az kaldı Mediha Nur! 🌸✨');
@@ -642,6 +676,10 @@ function inputNum(n) {
     userGrid[r][c]=n; renderBoard();
     CI(r,c).classList.add('error');
     mistakes++;
+    const lost=PENALTY[difficulty];
+    score=Math.max(0,score-lost);
+    updateScoreDisplay();
+    popScore(`-${lost}`, r, c, true);
     document.getElementById('mistakeBox').textContent=`❌ ${mistakes}/3`;
     showToast(rnd(WRONG_MSGS));
     setTimeout(()=>{ userGrid[r][c]=0; renderBoard(); selectCell(r,c); },800);
@@ -668,10 +706,26 @@ function checkWin(){
   for(let r=0;r<9;r++)for(let c=0;c<9;c++)
     if((userGrid[r][c]||puzzle[r][c])!==solution[r][c])return;
   gameOver=true; clearInterval(timerInterval);
+
+  // süre bonusu
+  const bonus=Math.max(0,(TIME_BONUS[difficulty]||600)-seconds);
+  score+=bonus;
+  updateScoreDisplay();
+
+  // yıldız hesabı
+  const maxScore=(81-countGivens())*POINTS[difficulty]+(TIME_BONUS[difficulty]||600);
+  const pct=score/maxScore;
+  const stars = pct>=0.8 ? '⭐⭐⭐' : pct>=0.5 ? '⭐⭐' : '⭐';
+
   const m=(0|seconds/60).toString().padStart(2,'0');
   const s=(seconds%60).toString().padStart(2,'0');
+
   document.getElementById('winEmoji').textContent=difficulty==='extreme'?'🏆':'🎉';
   document.getElementById('winSub').textContent=rnd(WIN_SUBS);
+  document.getElementById('winStars').textContent=stars;
+  document.getElementById('winScore').textContent=score.toLocaleString()+' puan';
+  document.getElementById('winScoreLabel').textContent=
+    bonus>0?`(${bonus} süre bonusu dahil)`:'';
   document.getElementById('winMsg').textContent=
     `${DIFF_EMOJI[difficulty]} ${DIFF_LABEL[difficulty]} — ${m}:${s} sürede tamamladın! 💕`;
   document.getElementById('winOverlay').classList.add('show');
@@ -704,6 +758,25 @@ function checkAll(){
 }
 
 /* ════════════════════════════════
+   SKOR
+════════════════════════════════ */
+function updateScoreDisplay(){
+  document.getElementById('scoreBox').textContent=`⭐ ${score.toLocaleString()}`;
+}
+
+function popScore(text, r, c, isMinus){
+  const el=CI(r,c);
+  const rect=el.getBoundingClientRect();
+  const div=document.createElement('div');
+  div.className='score-pop'+(isMinus?' minus':'');
+  div.textContent=text;
+  div.style.left=(rect.left+rect.width/2-16)+'px';
+  div.style.top=(rect.top-8)+'px';
+  document.body.appendChild(div);
+  setTimeout(()=>div.remove(),700);
+}
+
+/* ════════════════════════════════
    TIMER
 ════════════════════════════════ */
 function startTimer(){
@@ -731,9 +804,10 @@ function showToast(msg){
 ════════════════════════════════ */
 function startGame(diff){
   difficulty=diff; gameOver=false; mistakes=0;
-  selectedCell=null; notesMode=false; correctCount=0;
+  selectedCell=null; notesMode=false; correctCount=0; score=0;
   document.getElementById('notesToggle').classList.remove('on');
   document.getElementById('mistakeBox').textContent='❌ 0/3';
+  document.getElementById('scoreBox').textContent='⭐ 0';
   document.getElementById('winOverlay').classList.remove('show');
   const badge=document.getElementById('diffBadge');
   badge.textContent=`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]}`;
