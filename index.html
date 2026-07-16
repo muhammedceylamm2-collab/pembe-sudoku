@@ -114,7 +114,7 @@
 
     .menu-footer {
       margin-top: clamp(12px, 4vw, 20px);
-      color: #f9a8d4; font-size: 0.72rem; font-style: italic;
+      color: #000; font-size: 0.72rem; font-style: italic;
     }
 
     /* ════════ GAME SCREEN ════════ */
@@ -327,13 +327,13 @@
       <div class="card-desc">Dengeli<br>zorluk</div>
     </div>
     <div class="diff-card" data-diff="hard">
-      <div class="card-icon">🔥</div>
+      <div class="card-icon">🎀</div>
       <div class="card-name">Zor</div>
       <div class="card-stars">⭐⭐⭐</div>
       <div class="card-desc">Az ipucu,<br>çok strateji</div>
     </div>
     <div class="diff-card" data-diff="extreme">
-      <div class="card-icon">💀</div>
+      <div class="card-icon">👑</div>
       <div class="card-name">Ekstrem</div>
       <div class="card-stars">⭐⭐⭐⭐</div>
       <div class="card-desc">Gerçek<br>ustalar için!</div>
@@ -411,7 +411,7 @@
    MESAJLAR — Mediha Nur özel
 ════════════════════════════════ */
 const GREETINGS = [
-  "Merhaba Mediha Nur! 🌸 Bugün hangi seviyeyi fethedeceksin?",
+  "Merhaba Mediha Nur! 🌸 Bugün hangi seviyeyi seçiyoruz?",
   "Hoş geldin Mediha Nur! 💕 Seni bekliyordum!",
   "Mediha Nur burada! 🌷 Hadi rakamları yerleştir!",
   "Güzel günler Mediha Nur! 🌸 Zihni açık, kalp pembe!",
@@ -501,7 +501,7 @@ function countSol(g,lim) {
 ════════════════════════════════ */
 const REMOVALS   = {easy:36,medium:46,hard:54,extreme:62};
 const DIFF_LABEL = {easy:'Kolay',medium:'Orta',hard:'Zor',extreme:'Ekstrem'};
-const DIFF_EMOJI = {easy:'🌱',medium:'🌷',hard:'🔥',extreme:'💀'};
+const DIFF_EMOJI = {easy:'🌱',medium:'🌷',hard:'🎀',extreme:'👑'};
 
 let solution, puzzle, userGrid, notes;
 let selectedCell=null, mistakes=0, timerInterval=null, seconds=0;
