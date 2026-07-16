@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pembe Sudoku – Mediha Nur</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --cell: clamp(32px, calc((100vw - 60px) / 9), 52px);
+      --font-cell: clamp(1rem, 4vw, 1.35rem);
+      --note-font: clamp(0.4rem, 1.5vw, 0.55rem);
+    }
+
+    html, body {
+      height: 100%;
+      overscroll-behavior: none;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: linear-gradient(135deg, #ffe0f0 0%, #ffc2e0 45%, #ffb3d9 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 12px;
+      touch-action: manipulation;
+    }
+
+    /* ════════════════ SHARED ════════════════ */
+    .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
+    .screen.active { display: flex; }
+
+    .btn {
+      background: linear-gradient(135deg, #f472b6, #ec4899);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 22px;
+      font-size: clamp(0.82rem, 3.5vw, 1rem);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 12px #f9a8d480;
+      transition: transform .12s, box-shadow .12s;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .btn:active { transform: scale(0.95); }
+
+    .btn-ghost {
+      background: transparent;
+      color: #e06090;
+      border: 2px solid #f472b6;
+      box-shadow: none;
+    }
+    .btn-ghost:active { background: #fff0f7; }
+
+    /* ════════════════ MAIN MENU ════════════════ */
+    #menuScreen { gap: 0; text-align: center; padding: 10px 0; }
+
+    .menu-logo {
+      font-size: clamp(2.6rem, 12vw, 3.6rem);
+      margin-bottom: 4px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-7px); }
+    }
+
+    .menu-title {
+      font-size: clamp(1.7rem, 7vw, 2.6rem);
+      font-weight: 900;
+      color: #c0386a;
+      letter-spacing: 2px;
+      text-shadow: 1px 3px 6px #f9a8d4;
+      margin-bottom: 3px;
+    }
+
+    .menu-sub {
+      color: #e06090;
+      font-size: clamp(0.8rem, 3.5vw, 1rem);
+      margin-bottom: clamp(16px, 4vw, 32px);
+      font-style: italic;
+    }
+
+    .menu-label {
+      color: #be185d;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .diff-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(8px, 3vw, 14px);
+      width: 100%;
+      max-width: 420px;
+      padding: 0 4px;
+    }
+
+    .diff-card {
+      background: #fff0f7;
+      border: 3px solid #f9a8d4;
+      border-radius: 18px;
+      padding: clamp(14px, 4vw, 22px) 10px;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .diff-card:active { transform: scale(0.95); box-shadow: 0 2px 8px #f9a8d430; }
+
+    .diff-card .card-icon { font-size: clamp(1.6rem, 6vw, 2.2rem); margin-bottom: 6px; }
+    .diff-card .card-name { font-size: clamp(0.9rem, 4vw, 1.1rem); font-weight: 800; color: #be185d; margin-bottom: 3px; }
+    .diff-card .card-stars { font-size: 0.85rem; margin-top: 4px; }
+    .diff-card .card-desc { font-size: clamp(0.65rem, 2.5vw, 0.75rem); color: #db7aa0; line-height: 1.4; margin-top: 4px; }
+
+    .diff-card[data-diff="easy"]    { border-color: #86efac; }
+    .diff-card[data-diff="easy"]:active { border-color: #22c55e; }
+    .diff-card[data-diff="medium"]  { border-color: #fde68a; }
+    .diff-card[data-diff="medium"]:active { border-color: #f59e0b; }
+    .diff-card[data-diff="hard"]    { border-color: #fca5a5; }
+    .diff-card[data-diff="hard"]:active { border-color: #ef4444; }
+    .diff-card[data-diff="extreme"] { border-color: #c084fc; background: linear-gradient(135deg,#fdf4ff,#fce7f3); }
+    .diff-card[data-diff="extreme"]:active { border-color: #9333ea; }
+
+    /* ════════════════ GAME SCREEN ════════════════ */
+    #gameScreen { gap: 0; }
+
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 8px;
+      gap: 6px;
+    }
+
+    .game-title {
+      font-size: clamp(1rem, 4.5vw, 1.4rem);
+      font-weight: 900;
+      color: #c0386a;
+      letter-spacing: 1px;
+    }
+
+    .game-diff-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 2px;
+      width: fit-content;
+    }
+    .badge-easy    { background:#dcfce7; color:#16a34a; }
+    .badge-medium  { background:#fef9c3; color:#a16207; }
+    .badge-hard    { background:#fee2e2; color:#dc2626; }
+    .badge-extreme { background:#f3e8ff; color:#7c3aed; }
+
+    .stat-row { display: flex; gap: 6px; align-items: center; }
+
+    .info-box {
+      background: #fff0f7;
+      border: 2px solid #f9a8d4;
+      border-radius: 10px;
+      padding: 4px 10px;
+      color: #c0386a;
+      font-weight: 700;
+      font-size: clamp(0.75rem, 3vw, 0.9rem);
+      white-space: nowrap;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* ── board ── */
+    .board-wrap {
+      background: #fff0f7;
+      border-radius: 14px;
+      padding: clamp(6px, 2vw, 12px);
+      box-shadow: 0 6px 24px #f9a8d450;
+      border: 3px solid #f9a8d4;
+    }
+
+    table { border-collapse: collapse; }
+
+    td {
+      width: var(--cell);
+      height: var(--cell);
+      text-align: center;
+      vertical-align: middle;
+      border: 1px solid #fbb6ce;
+      position: relative;
+    }
+    td:nth-child(3n)    { border-right:  2.5px solid #e06090; }
+    tr:nth-child(3n) td { border-bottom: 2.5px solid #e06090; }
+    td:first-child      { border-left:   2.5px solid #e06090; }
+    tr:first-child td   { border-top:    2.5px solid #e06090; }
+
+    td input {
+      width: 100%; height: 100%;
+      border: none; background: transparent;
+      text-align: center;
+      font-size: var(--font-cell);
+      font-weight: 700;
+      color: #a83060;
+      outline: none;
+      cursor: pointer;
+      caret-color: transparent;
+      border-radius: 5px;
+      transition: background .1s;
+      /* prevent iOS zoom on focus */
+      font-size: max(16px, var(--font-cell));
+    }
+    /* override back for larger screens */
+    @media (min-width: 500px) {
+      td input { font-size: var(--font-cell); }
+    }
+
+    td input.given   { color: #c0386a; font-weight: 800; background: #ffe4f0; cursor: default; }
+    td input.selected  { background: #fce7f3 !important; }
+    td input.highlight { background: #fff0f7; }
+    td input.error   { background: #ffe4e8 !important; color: #e11d48 !important; }
+    td input.correct { background: #f0fdf4; color: #16a34a !important; }
+
+    /* ── numpad ── */
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: clamp(5px, 2vw, 8px);
+      margin-top: clamp(8px, 2.5vw, 14px);
+      width: 100%;
+      max-width: calc(var(--cell) * 9 + clamp(12px, 4vw, 24px));
+    }
+
+    .num-btn {
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      border: 2px solid #f9a8d4;
+      border-radius: 10px;
+      padding: clamp(8px, 3vw, 12px) 0;
+      font-size: clamp(1rem, 5vw, 1.25rem);
+      font-weight: 800;
+      color: #be185d;
+      cursor: pointer;
+      transition: background .1s, transform .1s;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .num-btn:active { background: linear-gradient(135deg,#f9a8d4,#f472b6); color:#fff; transform:scale(0.93); }
+    .num-btn.erase { font-size: clamp(0.7rem, 3vw, 0.95rem); color:#9ca3af; border-color:#e5e7eb; background:#f9fafb; }
+    .num-btn.erase:active { background:#fee2e2; color:#ef4444; border-color:#fca5a5; }
+
+    /* ── notes toggle ── */
+    .notes-row {
+      margin-top: clamp(8px, 2.5vw, 12px);
+      display: flex; align-items: center; gap: 10px;
+      color: #c0386a;
+      font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+      font-weight: 600;
+    }
+    .toggle-switch {
+      width: 42px; height: 24px; background: #fbb6ce;
+      border-radius: 12px; position: relative; cursor: pointer;
+      transition: background .2s; flex-shrink: 0;
+      touch-action: manipulation;
+    }
+    .toggle-switch.on { background: #f472b6; }
+    .toggle-switch::after {
+      content:''; position:absolute; top:4px; left:4px;
+      width:16px; height:16px; background:#fff;
+      border-radius:50%; transition:left .2s;
+    }
+    .toggle-switch.on::after { left:22px; }
+
+    /* ── notes overlay ── */
+    .notes-overlay {
+      position:absolute; inset:0;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      grid-template-rows:repeat(3,1fr);
+      pointer-events:none; padding:1px;
+    }
+    .note-digit {
+      font-size: var(--note-font);
+      font-weight:600; color:#be185d;
+      display:flex; align-items:center; justify-content:center;
+      opacity:0.8;
+    }
+    .note-digit.hidden { opacity:0; }
+
+    /* ════════════════ TOAST ════════════════ */
+    .toast {
+      position:fixed; top:20px; left:50%;
+      transform:translateX(-50%) translateY(-90px);
+      background:linear-gradient(135deg,#f472b6,#ec4899);
+      color:#fff; padding:10px 24px;
+      border-radius:30px;
+      font-size: clamp(0.85rem, 4vw, 1rem);
+      font-weight:700;
+      box-shadow:0 6px 20px #f9a8d460;
+      transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+      z-index:999; white-space:nowrap;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    /* ════════════════ WIN OVERLAY ════════════════ */
+    .win-overlay {
+      display:none; position:fixed; inset:0;
+      background:#f9a8d455; backdrop-filter:blur(6px);
+      align-items:center; justify-content:center; z-index:200;
+      padding: 16px;
+    }
+    .win-overlay.show { display:flex; }
+    .win-card {
+      background:#fff0f7; border:4px solid #f472b6;
+      border-radius:22px;
+      padding: clamp(24px, 6vw, 40px) clamp(20px, 7vw, 48px);
+      text-align:center;
+      box-shadow:0 12px 40px #f9a8d460;
+      animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+      max-width: 90vw;
+    }
+    @keyframes popIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
+    .win-card h2  { color:#be185d; font-size:clamp(1.4rem,6vw,2rem); margin-bottom:8px; }
+    .win-card p   { color:#e06090; font-size:clamp(0.85rem,3.5vw,1.05rem); margin-bottom:16px; }
+    .win-emoji { font-size:clamp(2rem,10vw,3rem); display:block; margin-bottom:8px; }
+    .win-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+    /* ════════════════ SAFE AREA (iPhone notch) ════════════════ */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      body { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MAIN MENU
+══════════════════════════════════════ -->
+<div id="menuScreen" class="screen active">
+  <div class="menu-logo">🌸</div>
+  <div class="menu-title">Pembe Sudoku</div>
+  <div class="menu-sub">Mediha Nur'un Sudoku Köşesi 💕</div>
+
+  <div class="menu-label">Seviye Seç</div>
+
+  <div class="diff-cards">
+    <div class="diff-card" data-diff="easy">
+      <div class="card-icon">🌱</div>
+      <div class="card-name">Kolay</div>
+      <div class="card-stars">⭐</div>
+      <div class="card-desc">Başlangıç için<br>ideal</div>
+    </div>
+    <div class="diff-card" data-diff="medium">
+      <div class="card-icon">🌷</div>
+      <div class="card-name">Orta</div>
+      <div class="card-stars">⭐⭐</div>
+      <div class="card-desc">Dengeli<br>zorluk</div>
+    </div>
+    <div class="diff-card" data-diff="hard">
+      <div class="card-icon">🔥</div>
+      <div class="card-name">Zor</div>
+      <div class="card-stars">⭐⭐⭐</div>
+      <div class="card-desc">Az ipucu,<br>çok strateji</div>
+    </div>
+    <div class="diff-card" data-diff="extreme">
+      <div class="card-icon">💀</div>
+      <div class="card-name">Ekstrem</div>
+      <div class="card-stars">⭐⭐⭐⭐</div>
+      <div class="card-desc">Gerçek<br>ustalar için!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     GAME SCREEN
+══════════════════════════════════════ -->
+<div id="gameScreen" class="screen">
+
+  <div class="game-header">
+    <div>
+      <div class="game-title">🌸 Pembe Sudoku</div>
+      <span class="game-diff-badge" id="diffBadge"></span>
+    </div>
+    <div class="stat-row">
+      <div class="info-box" id="timer">⏱ 00:00</div>
+      <div class="info-box" id="mistakeBox">❌ 0/3</div>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <button class="btn btn-ghost" id="menuBtn">← Menü</button>
+    <button class="btn btn-ghost" id="checkBtn">Kontrol</button>
+    <button class="btn" id="newGameBtn">Yeni Oyun</button>
+  </div>
+
+  <div class="board-wrap">
+    <table id="board"></table>
+  </div>
+
+  <div class="numpad" id="numpad">
+    <button class="num-btn" data-n="1">1</button>
+    <button class="num-btn" data-n="2">2</button>
+    <button class="num-btn" data-n="3">3</button>
+    <button class="num-btn" data-n="4">4</button>
+    <button class="num-btn" data-n="5">5</button>
+    <button class="num-btn" data-n="6">6</button>
+    <button class="num-btn" data-n="7">7</button>
+    <button class="num-btn" data-n="8">8</button>
+    <button class="num-btn" data-n="9">9</button>
+    <button class="num-btn erase" data-n="0">✕ Sil</button>
+  </div>
+
+  <div class="notes-row">
+    <div class="toggle-switch" id="notesToggle"></div>
+    <span>Not Modu</span>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- WIN OVERLAY -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-card">
+    <span class="win-emoji" id="winEmoji">🎉</span>
+    <h2>Tebrikler Mediha Nur!</h2>
+    <p style="color:#be185d;font-weight:700;margin-bottom:6px;">Sen harikasın! 🌸💕</p>
+    <p id="winMsg"></p>
+    <div class="win-btns">
+      <button class="btn" id="winNewGame">Yeni Oyun</button>
+      <button class="btn btn-ghost" id="winMenu">Ana Menü</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════
+   SUDOKU ENGINE
+════════════════════════════════════ */
+function generateSolved() {
+  const g = Array.from({length:9}, () => Array(9).fill(0));
+  solve(g);
+  return g;
+}
+function solve(g) {
+  for (let r=0;r<9;r++) for (let c=0;c<9;c++) {
+    if (g[r][c]===0) {
+      for (const n of shuffle([1,2,3,4,5,6,7,8,9])) {
+        if (valid(g,r,c,n)) { g[r][c]=n; if(solve(g))return true; g[r][c]=0; }
+      }
+      return false;
+    }
+  }
+  return true;
+}
+function valid(g,r,c,n) {
+  for (let i=0;i<9;i++) if(g[r][i]===n||g[i][c]===n) return false;
+  const br=(0|r/3)*3, bc=(0|c/3)*3;
+  for (let i=0;i<3;i++) for (let j=0;j<3;j++) if(g[br+i][bc+j]===n) return false;
+  return true;
+}
+function shuffle(a) {
+  for (let i=a.length-1;i>0;i--) { const j=0|Math.random()*(i+1); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function makePuzzle(sol, rem) {
+  const p=sol.map(r=>[...r]); let removed=0;
+  for (const idx of shuffle([...Array(81).keys()])) {
+    if (removed>=rem) break;
+    const r=0|idx/9, c=idx%9, bk=p[r][c];
+    p[r][c]=0;
+    if (countSol(p.map(x=>[...x]),2)===1) removed++;
+    else p[r][c]=bk;
+  }
+  return p;
+}
+function countSol(g,lim) {
+  let n=0;
+  (function bt(){
+    if(n>=lim)return;
+    for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+      if(g[r][c]===0){
+        for(let v=1;v<=9;v++){if(valid(g,r,c,v)){g[r][c]=v;bt();g[r][c]=0;if(n>=lim)return;}}
+        return;
+      }
+    }
+    n++;
+  })();
+  return n;
+}
+
+/* ════════════════════════════════════
+   STATE
+════════════════════════════════════ */
+const REMOVALS   = {easy:36, medium:46, hard:54, extreme:62};
+const DIFF_LABEL = {easy:'Kolay', medium:'Orta', hard:'Zor', extreme:'Ekstrem'};
+const DIFF_EMOJI = {easy:'🌱', medium:'🌷', hard:'🔥', extreme:'💀'};
+
+let solution, puzzle, userGrid, notes;
+let selectedCell=null, mistakes=0, timerInterval=null, seconds=0;
+let notesMode=false, difficulty='easy', gameOver=false;
+
+/* ════════════════════════════════════
+   SCREENS
+════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ════════════════════════════════════
+   BOARD DOM
+════════════════════════════════════ */
+function buildBoard() {
+  const tbl=document.getElementById('board'); tbl.innerHTML='';
+  for (let r=0;r<9;r++) {
+    const tr=document.createElement('tr');
+    for (let c=0;c<9;c++) {
+      const td=document.createElement('td');
+      const inp=document.createElement('input');
+      inp.type='text'; inp.readOnly=true;
+      inp.inputMode='none';
+      inp.dataset.r=r; inp.dataset.c=c;
+      inp.addEventListener('pointerdown', e=>{ e.preventDefault(); selectCell(r,c); });
+      const ov=document.createElement('div');
+      ov.className='notes-overlay'; ov.id=`no-${r}-${c}`;
+      for (let n=1;n<=9;n++){
+        const sp=document.createElement('span');
+        sp.className='note-digit hidden'; sp.id=`nd-${r}-${c}-${n}`; sp.textContent=n;
+        ov.appendChild(sp);
+      }
+      td.appendChild(inp); td.appendChild(ov); tr.appendChild(td);
+    }
+    tbl.appendChild(tr);
+  }
+}
+
+const cellInp=(r,c)=>document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+
+function renderBoard() {
+  for (let r=0;r<9;r++) for (let c=0;c<9;c++){
+    const el=cellInp(r,c);
+    el.className=''; el.value='';
+    const ov=document.getElementById(`no-${r}-${c}`);
+    ov.style.display='none';
+    if (puzzle[r][c])         { el.value=puzzle[r][c]; el.classList.add('given'); }
+    else if (userGrid[r][c])  { el.value=userGrid[r][c]; }
+    else {
+      if (notes[r][c].some(Boolean)){
+        ov.style.display='grid';
+        for(let n=1;n<=9;n++)
+          document.getElementById(`nd-${r}-${c}-${n}`).classList.toggle('hidden',!notes[r][c][n]);
+      }
+    }
+  }
+  updateHL();
+}
+
+/* ════════════════════════════════════
+   SELECTION / HIGHLIGHTS
+════════════════════════════════════ */
+function selectCell(r,c) {
+  if (gameOver) return;
+  selectedCell={r,c}; updateHL();
+}
+function updateHL() {
+  for (let r=0;r<9;r++) for (let c=0;c<9;c++)
+    cellInp(r,c).classList.remove('selected','highlight','error','correct');
+  if (!selectedCell) return;
+  const {r,c}=selectedCell;
+  const sv=userGrid[r][c]||puzzle[r][c];
+  for (let i=0;i<9;i++) for (let j=0;j<9;j++){
+    const el=cellInp(i,j);
+    const cv=userGrid[i][j]||puzzle[i][j];
+    const sg=i===r||j===c||((0|i/3)===(0|r/3)&&(0|j/3)===(0|c/3));
+    if(sg||(sv&&cv===sv)) el.classList.add('highlight');
+  }
+  cellInp(r,c).classList.add('selected');
+  cellInp(r,c).classList.remove('highlight');
+}
+
+/* ════════════════════════════════════
+   INPUT
+════════════════════════════════════ */
+function inputNum(n) {
+  if (!selectedCell||gameOver) return;
+  const {r,c}=selectedCell;
+  if (puzzle[r][c]) return;
+  if (n===0){ userGrid[r][c]=0; notes[r][c]=Array(10).fill(false); renderBoard(); selectCell(r,c); return; }
+  if (notesMode){
+    notes[r][c][n]=!notes[r][c][n];
+    if(userGrid[r][c]) userGrid[r][c]=0;
+    renderBoard(); selectCell(r,c); return;
+  }
+  notes[r][c]=Array(10).fill(false);
+  if (n===solution[r][c]){
+    userGrid[r][c]=n; clearPeerNotes(r,c,n);
+    renderBoard(); selectCell(r,c); checkWin();
+  } else {
+    userGrid[r][c]=n; renderBoard();
+    cellInp(r,c).classList.add('error');
+    mistakes++;
+    document.getElementById('mistakeBox').textContent=`❌ ${mistakes}/3`;
+    showToast('Yanlış! Tekrar dene 🌸');
+    setTimeout(()=>{ userGrid[r][c]=0; renderBoard(); selectCell(r,c); },800);
+    if(mistakes>=3) setTimeout(()=>loseGame(),900);
+  }
+}
+function clearPeerNotes(r,c,n){
+  for(let i=0;i<9;i++){notes[r][i][n]=false;notes[i][c][n]=false;}
+  const br=(0|r/3)*3,bc=(0|c/3)*3;
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++)notes[br+i][bc+j][n]=false;
+}
+
+/* ════════════════════════════════════
+   WIN / LOSE
+════════════════════════════════════ */
+function checkWin(){
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++)
+    if((userGrid[r][c]||puzzle[r][c])!==solution[r][c])return;
+  gameOver=true; clearInterval(timerInterval);
+  const m=(0|seconds/60).toString().padStart(2,'0');
+  const s=(seconds%60).toString().padStart(2,'0');
+  document.getElementById('winEmoji').textContent=difficulty==='extreme'?'🏆':'🎉';
+  document.getElementById('winMsg').textContent=
+    `${DIFF_EMOJI[difficulty]} ${DIFF_LABEL[difficulty]} seviyesini ${m}:${s} sürede tamamladın! 💕`;
+  document.getElementById('winOverlay').classList.add('show');
+}
+function loseGame(){
+  gameOver=true; clearInterval(timerInterval);
+  showToast('Oyun bitti! 3 hata yaptın 😢');
+  setTimeout(()=>{
+    for(let r=0;r<9;r++)for(let c=0;c<9;c++)
+      if(!puzzle[r][c]) userGrid[r][c]=solution[r][c];
+    renderBoard();
+  },1200);
+}
+
+/* ════════════════════════════════════
+   CHECK BUTTON
+════════════════════════════════════ */
+function checkAll(){
+  if(gameOver)return;
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    if(!puzzle[r][c]&&userGrid[r][c]){
+      if(userGrid[r][c]===solution[r][c]) cellInp(r,c).classList.add('correct');
+      else cellInp(r,c).classList.add('error');
+    }
+  }
+  showToast('Hatalar işaretlendi 🔍');
+  setTimeout(()=>{ renderBoard(); if(selectedCell)updateHL(); },1500);
+}
+
+/* ════════════════════════════════════
+   TIMER
+════════════════════════════════════ */
+function startTimer(){
+  clearInterval(timerInterval); seconds=0; tickTimer();
+  timerInterval=setInterval(()=>{ if(!gameOver){seconds++;tickTimer();} },1000);
+}
+function tickTimer(){
+  const m=(0|seconds/60).toString().padStart(2,'0');
+  const s=(seconds%60).toString().padStart(2,'0');
+  document.getElementById('timer').textContent=`⏱ ${m}:${s}`;
+}
+
+/* ════════════════════════════════════
+   TOAST
+════════════════════════════════════ */
+let _tt;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),2300);
+}
+
+/* ════════════════════════════════════
+   GAME FLOW
+════════════════════════════════════ */
+function startGame(diff){
+  difficulty=diff;
+  gameOver=false; mistakes=0; selectedCell=null; notesMode=false;
+  document.getElementById('notesToggle').classList.remove('on');
+  document.getElementById('mistakeBox').textContent='❌ 0/3';
+  document.getElementById('winOverlay').classList.remove('show');
+  const badge=document.getElementById('diffBadge');
+  badge.textContent=`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]}`;
+  badge.className=`game-diff-badge badge-${diff}`;
+  showScreen('gameScreen');
+  showToast('Hazırlanıyor... 🌸');
+  setTimeout(()=>{
+    solution=generateSolved();
+    puzzle=makePuzzle(solution,REMOVALS[diff]);
+    userGrid=Array.from({length:9},()=>Array(9).fill(0));
+    notes=Array.from({length:9},()=>Array.from({length:9},()=>Array(10).fill(false)));
+    renderBoard(); startTimer();
+    showToast(`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]} başladı! 🌸`);
+  },80);
+}
+function goToMenu(){
+  clearInterval(timerInterval);
+  document.getElementById('winOverlay').classList.remove('show');
+  showScreen('menuScreen');
+}
+
+/* ════════════════════════════════════
+   KEYBOARD (masaüstü)
+════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if(!selectedCell)return;
+  const {r,c}=selectedCell;
+  if(e.key>='1'&&e.key<='9'){inputNum(parseInt(e.key));return;}
+  if(e.key==='Backspace'||e.key==='Delete'||e.key==='0'){inputNum(0);return;}
+  const mv={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+  if(mv[e.key]){
+    e.preventDefault();
+    const[dr,dc]=mv[e.key];
+    selectCell(Math.max(0,Math.min(8,r+dr)),Math.max(0,Math.min(8,c+dc)));
+  }
+});
+
+/* ════════════════════════════════════
+   EVENTS
+════════════════════════════════════ */
+document.querySelectorAll('.diff-card').forEach(card=>{
+  card.addEventListener('pointerdown',e=>{e.preventDefault();startGame(card.dataset.diff);});
+});
+document.getElementById('numpad').addEventListener('pointerdown',e=>{
+  const btn=e.target.closest('.num-btn');
+  if(btn){e.preventDefault();inputNum(parseInt(btn.dataset.n));}
+});
+document.getElementById('newGameBtn').addEventListener('click',()=>startGame(difficulty));
+document.getElementById('checkBtn').addEventListener('click',checkAll);
+document.getElementById('menuBtn').addEventListener('click',goToMenu);
+document.getElementById('winNewGame').addEventListener('click',()=>startGame(difficulty));
+document.getElementById('winMenu').addEventListener('click',goToMenu);
+document.getElementById('notesToggle').addEventListener('click',()=>{
+  notesMode=!notesMode;
+  document.getElementById('notesToggle').classList.toggle('on',notesMode);
+});
+
+/* ════════════════════════════════════
+   INIT
+════════════════════════════════════ */
+buildBoard();
+</script>
+</body>
+</html>
