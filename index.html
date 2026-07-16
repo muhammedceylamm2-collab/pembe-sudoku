@@ -10,13 +10,10 @@
     :root {
       --cell: clamp(32px, calc((100vw - 60px) / 9), 52px);
       --font-cell: clamp(1rem, 4vw, 1.35rem);
-      --note-font: clamp(0.4rem, 1.5vw, 0.55rem);
+      --note-font: clamp(0.38rem, 1.4vw, 0.55rem);
     }
 
-    html, body {
-      height: 100%;
-      overscroll-behavior: none;
-    }
+    html, body { height: 100%; overscroll-behavior: none; }
 
     body {
       min-height: 100vh;
@@ -31,36 +28,29 @@
       touch-action: manipulation;
     }
 
-    /* ════════════════ SHARED ════════════════ */
+    /* ════════ SHARED ════════ */
     .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
     .screen.active { display: flex; }
 
     .btn {
       background: linear-gradient(135deg, #f472b6, #ec4899);
-      color: #fff;
-      border: none;
-      border-radius: 24px;
+      color: #fff; border: none; border-radius: 24px;
       padding: 10px 22px;
       font-size: clamp(0.82rem, 3.5vw, 1rem);
-      font-weight: 700;
-      cursor: pointer;
+      font-weight: 700; cursor: pointer;
       box-shadow: 0 3px 12px #f9a8d480;
       transition: transform .12s, box-shadow .12s;
-      user-select: none;
-      -webkit-user-select: none;
+      user-select: none; -webkit-user-select: none;
       touch-action: manipulation;
     }
     .btn:active { transform: scale(0.95); }
-
     .btn-ghost {
-      background: transparent;
-      color: #e06090;
-      border: 2px solid #f472b6;
-      box-shadow: none;
+      background: transparent; color: #e06090;
+      border: 2px solid #f472b6; box-shadow: none;
     }
     .btn-ghost:active { background: #fff0f7; }
 
-    /* ════════════════ MAIN MENU ════════════════ */
+    /* ════════ MAIN MENU ════════ */
     #menuScreen { gap: 0; text-align: center; padding: 10px 0; }
 
     .menu-logo {
@@ -68,101 +58,76 @@
       margin-bottom: 4px;
       animation: float 3s ease-in-out infinite;
     }
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-7px); }
-    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
 
     .menu-title {
       font-size: clamp(1.7rem, 7vw, 2.6rem);
-      font-weight: 900;
-      color: #c0386a;
+      font-weight: 900; color: #c0386a;
       letter-spacing: 2px;
       text-shadow: 1px 3px 6px #f9a8d4;
       margin-bottom: 3px;
     }
-
     .menu-sub {
-      color: #e06090;
-      font-size: clamp(0.8rem, 3.5vw, 1rem);
-      margin-bottom: clamp(16px, 4vw, 32px);
-      font-style: italic;
+      color: #e06090; font-size: clamp(0.8rem, 3.5vw, 1rem);
+      margin-bottom: 4px; font-style: italic;
     }
-
-    .menu-label {
+    .menu-greeting {
+      background: #fff0f7;
+      border: 2px solid #f9a8d4;
+      border-radius: 14px;
+      padding: 8px 18px;
       color: #be185d;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
+      font-size: clamp(0.72rem, 3vw, 0.85rem);
+      font-weight: 600;
+      margin-bottom: clamp(14px, 4vw, 26px);
+      max-width: 340px;
+    }
+    .menu-label {
+      color: #be185d; font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
     }
 
     .diff-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: grid; grid-template-columns: 1fr 1fr;
       gap: clamp(8px, 3vw, 14px);
-      width: 100%;
-      max-width: 420px;
-      padding: 0 4px;
+      width: 100%; max-width: 420px; padding: 0 4px;
     }
-
     .diff-card {
-      background: #fff0f7;
-      border: 3px solid #f9a8d4;
+      background: #fff0f7; border: 3px solid #f9a8d4;
       border-radius: 18px;
       padding: clamp(14px, 4vw, 22px) 10px;
       cursor: pointer;
       transition: transform .15s, box-shadow .15s;
       text-align: center;
-      user-select: none;
-      -webkit-user-select: none;
+      user-select: none; -webkit-user-select: none;
       touch-action: manipulation;
     }
-    .diff-card:active { transform: scale(0.95); box-shadow: 0 2px 8px #f9a8d430; }
-
-    .diff-card .card-icon { font-size: clamp(1.6rem, 6vw, 2.2rem); margin-bottom: 6px; }
-    .diff-card .card-name { font-size: clamp(0.9rem, 4vw, 1.1rem); font-weight: 800; color: #be185d; margin-bottom: 3px; }
+    .diff-card:active { transform: scale(0.95); }
+    .diff-card .card-icon  { font-size: clamp(1.6rem, 6vw, 2.2rem); margin-bottom: 6px; }
+    .diff-card .card-name  { font-size: clamp(0.9rem, 4vw, 1.1rem); font-weight: 800; color: #be185d; margin-bottom: 3px; }
     .diff-card .card-stars { font-size: 0.85rem; margin-top: 4px; }
-    .diff-card .card-desc { font-size: clamp(0.65rem, 2.5vw, 0.75rem); color: #db7aa0; line-height: 1.4; margin-top: 4px; }
-
+    .diff-card .card-desc  { font-size: clamp(0.65rem, 2.5vw, 0.75rem); color: #db7aa0; line-height: 1.4; margin-top: 4px; }
     .diff-card[data-diff="easy"]    { border-color: #86efac; }
-    .diff-card[data-diff="easy"]:active { border-color: #22c55e; }
     .diff-card[data-diff="medium"]  { border-color: #fde68a; }
-    .diff-card[data-diff="medium"]:active { border-color: #f59e0b; }
     .diff-card[data-diff="hard"]    { border-color: #fca5a5; }
-    .diff-card[data-diff="hard"]:active { border-color: #ef4444; }
     .diff-card[data-diff="extreme"] { border-color: #c084fc; background: linear-gradient(135deg,#fdf4ff,#fce7f3); }
-    .diff-card[data-diff="extreme"]:active { border-color: #9333ea; }
 
-    /* ════════════════ GAME SCREEN ════════════════ */
+    .menu-footer {
+      margin-top: clamp(12px, 4vw, 20px);
+      color: #f9a8d4; font-size: 0.72rem; font-style: italic;
+    }
+
+    /* ════════ GAME SCREEN ════════ */
     #gameScreen { gap: 0; }
 
     .game-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 500px;
-      margin-bottom: 8px;
-      gap: 6px;
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 500px; margin-bottom: 8px; gap: 6px;
     }
-
-    .game-title {
-      font-size: clamp(1rem, 4.5vw, 1.4rem);
-      font-weight: 900;
-      color: #c0386a;
-      letter-spacing: 1px;
-    }
-
+    .game-title { font-size: clamp(1rem, 4.5vw, 1.4rem); font-weight: 900; color: #c0386a; letter-spacing: 1px; }
     .game-diff-badge {
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 2px 9px;
-      border-radius: 10px;
-      display: inline-block;
-      margin-top: 2px;
-      width: fit-content;
+      font-size: 0.7rem; font-weight: 700; padding: 2px 9px;
+      border-radius: 10px; display: inline-block; margin-top: 2px; width: fit-content;
     }
     .badge-easy    { background:#dcfce7; color:#16a34a; }
     .badge-medium  { background:#fef9c3; color:#a16207; }
@@ -170,104 +135,98 @@
     .badge-extreme { background:#f3e8ff; color:#7c3aed; }
 
     .stat-row { display: flex; gap: 6px; align-items: center; }
-
     .info-box {
-      background: #fff0f7;
-      border: 2px solid #f9a8d4;
-      border-radius: 10px;
-      padding: 4px 10px;
-      color: #c0386a;
-      font-weight: 700;
-      font-size: clamp(0.75rem, 3vw, 0.9rem);
-      white-space: nowrap;
+      background: #fff0f7; border: 2px solid #f9a8d4; border-radius: 10px;
+      padding: 4px 10px; color: #c0386a; font-weight: 700;
+      font-size: clamp(0.75rem, 3vw, 0.9rem); white-space: nowrap;
     }
 
     .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-      width: 100%;
-      max-width: 500px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; margin-bottom: 10px; flex-wrap: wrap;
+      width: 100%; max-width: 500px;
     }
 
     /* ── board ── */
     .board-wrap {
-      background: #fff0f7;
-      border-radius: 14px;
+      background: #fff0f7; border-radius: 14px;
       padding: clamp(6px, 2vw, 12px);
       box-shadow: 0 6px 24px #f9a8d450;
       border: 3px solid #f9a8d4;
     }
-
     table { border-collapse: collapse; }
-
     td {
-      width: var(--cell);
-      height: var(--cell);
-      text-align: center;
-      vertical-align: middle;
-      border: 1px solid #fbb6ce;
-      position: relative;
+      width: var(--cell); height: var(--cell);
+      text-align: center; vertical-align: middle;
+      border: 1px solid #fbb6ce; position: relative;
     }
-    td:nth-child(3n)    { border-right:  2.5px solid #e06090; }
-    tr:nth-child(3n) td { border-bottom: 2.5px solid #e06090; }
-    td:first-child      { border-left:   2.5px solid #e06090; }
-    tr:first-child td   { border-top:    2.5px solid #e06090; }
+    td:nth-child(3n)    { border-right:  2.5px solid #c0386a; }
+    tr:nth-child(3n) td { border-bottom: 2.5px solid #c0386a; }
+    td:first-child      { border-left:   2.5px solid #c0386a; }
+    tr:first-child td   { border-top:    2.5px solid #c0386a; }
 
     td input {
-      width: 100%; height: 100%;
-      border: none; background: transparent;
-      text-align: center;
-      font-size: var(--font-cell);
-      font-weight: 700;
-      color: #a83060;
-      outline: none;
-      cursor: pointer;
-      caret-color: transparent;
-      border-radius: 5px;
-      transition: background .1s;
-      /* prevent iOS zoom on focus */
+      width: 100%; height: 100%; border: none;
+      background: transparent; text-align: center;
       font-size: max(16px, var(--font-cell));
+      font-weight: 700; color: #9d174d;
+      outline: none; cursor: pointer;
+      caret-color: transparent; border-radius: 5px;
+      transition: background .1s, color .1s;
     }
-    /* override back for larger screens */
-    @media (min-width: 500px) {
-      td input { font-size: var(--font-cell); }
+    @media (min-width: 500px) { td input { font-size: var(--font-cell); } }
+
+    /* given (verilen) hücreler */
+    td input.given   {
+      color: #831843; font-weight: 900;
+      background: #fce7f3;
+      cursor: default;
     }
 
-    td input.given   { color: #c0386a; font-weight: 800; background: #ffe4f0; cursor: default; }
-    td input.selected  { background: #fce7f3 !important; }
-    td input.highlight { background: #fff0f7; }
-    td input.error   { background: #ffe4e8 !important; color: #e11d48 !important; }
-    td input.correct { background: #f0fdf4; color: #16a34a !important; }
+    /* SEÇİLİ hücre — koyu pembe zemin + beyaz rakam */
+    td input.selected {
+      background: #be185d !important;
+      color: #ffffff !important;
+      font-weight: 900 !important;
+    }
+
+    /* aynı satır/sütun/kutu */
+    td input.highlight { background: #fce7f3; }
+
+    /* aynı satır/sütun/kutu + given */
+    td input.given.highlight { background: #fbcfe8; }
+
+    /* aynı rakam vurgusu */
+    td input.same-num {
+      background: #f9a8d4 !important;
+      color: #831843 !important;
+    }
+
+    td input.error   { background: #ffe4e8 !important; color: #e11d48 !important; font-weight: 900 !important; }
+    td input.correct { background: #dcfce7 !important; color: #15803d !important; font-weight: 900 !important; }
 
     /* ── numpad ── */
     .numpad {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      display: grid; grid-template-columns: repeat(5, 1fr);
       gap: clamp(5px, 2vw, 8px);
       margin-top: clamp(8px, 2.5vw, 14px);
       width: 100%;
       max-width: calc(var(--cell) * 9 + clamp(12px, 4vw, 24px));
     }
-
     .num-btn {
       background: linear-gradient(135deg, #fce7f3, #fbcfe8);
-      border: 2px solid #f9a8d4;
-      border-radius: 10px;
+      border: 2px solid #f9a8d4; border-radius: 10px;
       padding: clamp(8px, 3vw, 12px) 0;
       font-size: clamp(1rem, 5vw, 1.25rem);
-      font-weight: 800;
-      color: #be185d;
+      font-weight: 800; color: #be185d;
       cursor: pointer;
       transition: background .1s, transform .1s;
-      user-select: none;
-      -webkit-user-select: none;
+      user-select: none; -webkit-user-select: none;
       touch-action: manipulation;
     }
     .num-btn:active { background: linear-gradient(135deg,#f9a8d4,#f472b6); color:#fff; transform:scale(0.93); }
+    /* Tükenmiş rakam — boşluk olarak kalır, görünmez */
+    .num-btn.used { visibility: hidden; pointer-events: none; }
     .num-btn.erase { font-size: clamp(0.7rem, 3vw, 0.95rem); color:#9ca3af; border-color:#e5e7eb; background:#f9fafb; }
     .num-btn.erase:active { background:#fee2e2; color:#ef4444; border-color:#fca5a5; }
 
@@ -275,15 +234,12 @@
     .notes-row {
       margin-top: clamp(8px, 2.5vw, 12px);
       display: flex; align-items: center; gap: 10px;
-      color: #c0386a;
-      font-size: clamp(0.8rem, 3.5vw, 0.9rem);
-      font-weight: 600;
+      color: #c0386a; font-size: clamp(0.8rem, 3.5vw, 0.9rem); font-weight: 600;
     }
     .toggle-switch {
       width: 42px; height: 24px; background: #fbb6ce;
       border-radius: 12px; position: relative; cursor: pointer;
-      transition: background .2s; flex-shrink: 0;
-      touch-action: manipulation;
+      transition: background .2s; flex-shrink: 0; touch-action: manipulation;
     }
     .toggle-switch.on { background: #f472b6; }
     .toggle-switch::after {
@@ -296,60 +252,49 @@
     /* ── notes overlay ── */
     .notes-overlay {
       position:absolute; inset:0;
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      grid-template-rows:repeat(3,1fr);
+      display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr);
       pointer-events:none; padding:1px;
     }
     .note-digit {
-      font-size: var(--note-font);
-      font-weight:600; color:#be185d;
-      display:flex; align-items:center; justify-content:center;
-      opacity:0.8;
+      font-size: var(--note-font); font-weight:600; color:#be185d;
+      display:flex; align-items:center; justify-content:center; opacity:0.8;
     }
     .note-digit.hidden { opacity:0; }
 
-    /* ════════════════ TOAST ════════════════ */
+    /* ════════ TOAST ════════ */
     .toast {
       position:fixed; top:20px; left:50%;
       transform:translateX(-50%) translateY(-90px);
       background:linear-gradient(135deg,#f472b6,#ec4899);
-      color:#fff; padding:10px 24px;
-      border-radius:30px;
-      font-size: clamp(0.85rem, 4vw, 1rem);
-      font-weight:700;
+      color:#fff; padding:10px 24px; border-radius:30px;
+      font-size:clamp(0.85rem,4vw,1rem); font-weight:700;
       box-shadow:0 6px 20px #f9a8d460;
       transition:transform .4s cubic-bezier(.34,1.56,.64,1);
       z-index:999; white-space:nowrap;
-      max-width: 90vw;
-      text-align: center;
+      max-width:92vw; text-align:center;
     }
     .toast.show { transform:translateX(-50%) translateY(0); }
 
-    /* ════════════════ WIN OVERLAY ════════════════ */
+    /* ════════ WIN OVERLAY ════════ */
     .win-overlay {
       display:none; position:fixed; inset:0;
       background:#f9a8d455; backdrop-filter:blur(6px);
-      align-items:center; justify-content:center; z-index:200;
-      padding: 16px;
+      align-items:center; justify-content:center; z-index:200; padding:16px;
     }
     .win-overlay.show { display:flex; }
     .win-card {
-      background:#fff0f7; border:4px solid #f472b6;
-      border-radius:22px;
-      padding: clamp(24px, 6vw, 40px) clamp(20px, 7vw, 48px);
-      text-align:center;
-      box-shadow:0 12px 40px #f9a8d460;
-      animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
-      max-width: 90vw;
+      background:#fff0f7; border:4px solid #f472b6; border-radius:22px;
+      padding:clamp(22px,6vw,40px) clamp(18px,7vw,48px);
+      text-align:center; box-shadow:0 12px 40px #f9a8d460;
+      animation:popIn .4s cubic-bezier(.34,1.56,.64,1); max-width:92vw;
     }
     @keyframes popIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
-    .win-card h2  { color:#be185d; font-size:clamp(1.4rem,6vw,2rem); margin-bottom:8px; }
-    .win-card p   { color:#e06090; font-size:clamp(0.85rem,3.5vw,1.05rem); margin-bottom:16px; }
     .win-emoji { font-size:clamp(2rem,10vw,3rem); display:block; margin-bottom:8px; }
+    .win-card h2 { color:#be185d; font-size:clamp(1.3rem,6vw,2rem); margin-bottom:6px; }
+    .win-card .win-sub { color:#be185d; font-size:clamp(0.85rem,3.5vw,1rem); font-weight:700; margin-bottom:6px; }
+    .win-card p { color:#e06090; font-size:clamp(0.8rem,3vw,1rem); margin-bottom:16px; }
     .win-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
-    /* ════════════════ SAFE AREA (iPhone notch) ════════════════ */
     @supports (padding: env(safe-area-inset-bottom)) {
       body { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
     }
@@ -357,15 +302,16 @@
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
+<!-- ══════════════════════════════
      MAIN MENU
-══════════════════════════════════════ -->
+══════════════════════════════ -->
 <div id="menuScreen" class="screen active">
   <div class="menu-logo">🌸</div>
   <div class="menu-title">Pembe Sudoku</div>
-  <div class="menu-sub">Mediha Nur'un Sudoku Köşesi 💕</div>
+  <div class="menu-sub">Mediha Nur'un Özel Köşesi 💕</div>
+  <div class="menu-greeting" id="menuGreeting"></div>
 
-  <div class="menu-label">Seviye Seç</div>
+  <div class="menu-label">Seviyeni Seç</div>
 
   <div class="diff-cards">
     <div class="diff-card" data-diff="easy">
@@ -393,16 +339,18 @@
       <div class="card-desc">Gerçek<br>ustalar için!</div>
     </div>
   </div>
+
+  <div class="menu-footer">🌸 Sadece Mediha Nur için yapıldı 🌸</div>
 </div>
 
-<!-- ══════════════════════════════════════
+<!-- ══════════════════════════════
      GAME SCREEN
-══════════════════════════════════════ -->
+══════════════════════════════ -->
 <div id="gameScreen" class="screen">
 
   <div class="game-header">
     <div>
-      <div class="game-title">🌸 Pembe Sudoku</div>
+      <div class="game-title">🌸 Mediha Nur'un Sudokusu</div>
       <span class="game-diff-badge" id="diffBadge"></span>
     </div>
     <div class="stat-row">
@@ -449,7 +397,7 @@
   <div class="win-card">
     <span class="win-emoji" id="winEmoji">🎉</span>
     <h2>Tebrikler Mediha Nur!</h2>
-    <p style="color:#be185d;font-weight:700;margin-bottom:6px;">Sen harikasın! 🌸💕</p>
+    <p class="win-sub" id="winSub"></p>
     <p id="winMsg"></p>
     <div class="win-btns">
       <button class="btn" id="winNewGame">Yeni Oyun</button>
@@ -459,13 +407,47 @@
 </div>
 
 <script>
-/* ════════════════════════════════════
+/* ════════════════════════════════
+   MESAJLAR — Mediha Nur özel
+════════════════════════════════ */
+const GREETINGS = [
+  "Merhaba Mediha Nur! 🌸 Bugün hangi seviyeyi fethedeceksin?",
+  "Hoş geldin Mediha Nur! 💕 Seni bekliyordum!",
+  "Mediha Nur burada! 🌷 Hadi rakamları yerleştir!",
+  "Güzel günler Mediha Nur! 🌸 Zihni açık, kalp pembe!",
+  "Mediha Nur, sen yaparsın! 💪🌸 Seçimini yap!",
+];
+
+const WRONG_MSGS = [
+  "Olmadı Mediha Nur, bir daha dene! 🌸",
+  "Hata! Ama sen yaparsın 💕",
+  "Yanlış! Mediha Nur, düşün bakalım 🌷",
+  "Bu değildi! Tekrar dene 🌸",
+  "Olmaz öyle! Sen akıllısın 💕",
+];
+
+const MILESTONE_MSGS = [
+  "Süper gidiyorsun Mediha Nur! 🌸",
+  "Harika! Devam et! 💕",
+  "Bravo Mediha Nur! 🌷",
+  "Çok iyi! Neredeyse bitti! ✨",
+];
+
+const WIN_SUBS = [
+  "Zihninle bizi büyülemeye devam et! 🌷",
+  "Senden daha zeki kimse yok! 💕",
+  "Her bulmacayı çözen Mediha Nur! ✨",
+  "Muhteşemsin, bunu bil! 🌸",
+];
+
+function rnd(arr) { return arr[0|Math.random()*arr.length]; }
+
+/* ════════════════════════════════
    SUDOKU ENGINE
-════════════════════════════════════ */
+════════════════════════════════ */
 function generateSolved() {
-  const g = Array.from({length:9}, () => Array(9).fill(0));
-  solve(g);
-  return g;
+  const g = Array.from({length:9}, ()=>Array(9).fill(0));
+  solve(g); return g;
 }
 function solve(g) {
   for (let r=0;r<9;r++) for (let c=0;c<9;c++) {
@@ -503,7 +485,7 @@ function countSol(g,lim) {
   let n=0;
   (function bt(){
     if(n>=lim)return;
-    for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    for(let r=0;r<9;r++) for(let c=0;c<9;c++) {
       if(g[r][c]===0){
         for(let v=1;v<=9;v++){if(valid(g,r,c,v)){g[r][c]=v;bt();g[r][c]=0;if(n>=lim)return;}}
         return;
@@ -514,28 +496,29 @@ function countSol(g,lim) {
   return n;
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    STATE
-════════════════════════════════════ */
-const REMOVALS   = {easy:36, medium:46, hard:54, extreme:62};
-const DIFF_LABEL = {easy:'Kolay', medium:'Orta', hard:'Zor', extreme:'Ekstrem'};
-const DIFF_EMOJI = {easy:'🌱', medium:'🌷', hard:'🔥', extreme:'💀'};
+════════════════════════════════ */
+const REMOVALS   = {easy:36,medium:46,hard:54,extreme:62};
+const DIFF_LABEL = {easy:'Kolay',medium:'Orta',hard:'Zor',extreme:'Ekstrem'};
+const DIFF_EMOJI = {easy:'🌱',medium:'🌷',hard:'🔥',extreme:'💀'};
 
 let solution, puzzle, userGrid, notes;
 let selectedCell=null, mistakes=0, timerInterval=null, seconds=0;
 let notesMode=false, difficulty='easy', gameOver=false;
+let correctCount=0; // toplam doğru yerleştirme sayısı
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    SCREENS
-════════════════════════════════════ */
+════════════════════════════════ */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    BOARD DOM
-════════════════════════════════════ */
+════════════════════════════════ */
 function buildBoard() {
   const tbl=document.getElementById('board'); tbl.innerHTML='';
   for (let r=0;r<9;r++) {
@@ -543,10 +526,9 @@ function buildBoard() {
     for (let c=0;c<9;c++) {
       const td=document.createElement('td');
       const inp=document.createElement('input');
-      inp.type='text'; inp.readOnly=true;
-      inp.inputMode='none';
+      inp.type='text'; inp.readOnly=true; inp.inputMode='none';
       inp.dataset.r=r; inp.dataset.c=c;
-      inp.addEventListener('pointerdown', e=>{ e.preventDefault(); selectCell(r,c); });
+      inp.addEventListener('pointerdown',e=>{ e.preventDefault(); selectCell(r,c); });
       const ov=document.createElement('div');
       ov.className='notes-overlay'; ov.id=`no-${r}-${c}`;
       for (let n=1;n<=9;n++){
@@ -559,87 +541,123 @@ function buildBoard() {
     tbl.appendChild(tr);
   }
 }
-
-const cellInp=(r,c)=>document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+const CI=(r,c)=>document.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
 
 function renderBoard() {
   for (let r=0;r<9;r++) for (let c=0;c<9;c++){
-    const el=cellInp(r,c);
-    el.className=''; el.value='';
-    const ov=document.getElementById(`no-${r}-${c}`);
-    ov.style.display='none';
-    if (puzzle[r][c])         { el.value=puzzle[r][c]; el.classList.add('given'); }
-    else if (userGrid[r][c])  { el.value=userGrid[r][c]; }
-    else {
-      if (notes[r][c].some(Boolean)){
-        ov.style.display='grid';
-        for(let n=1;n<=9;n++)
-          document.getElementById(`nd-${r}-${c}-${n}`).classList.toggle('hidden',!notes[r][c][n]);
-      }
+    const el=CI(r,c); el.className=''; el.value='';
+    const ov=document.getElementById(`no-${r}-${c}`); ov.style.display='none';
+    if (puzzle[r][c])        { el.value=puzzle[r][c]; el.classList.add('given'); }
+    else if (userGrid[r][c]) { el.value=userGrid[r][c]; }
+    else if (notes[r][c].some(Boolean)){
+      ov.style.display='grid';
+      for(let n=1;n<=9;n++)
+        document.getElementById(`nd-${r}-${c}-${n}`).classList.toggle('hidden',!notes[r][c][n]);
     }
   }
   updateHL();
+  updateNumpad();
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    SELECTION / HIGHLIGHTS
-════════════════════════════════════ */
+════════════════════════════════ */
 function selectCell(r,c) {
   if (gameOver) return;
   selectedCell={r,c}; updateHL();
 }
+
 function updateHL() {
   for (let r=0;r<9;r++) for (let c=0;c<9;c++)
-    cellInp(r,c).classList.remove('selected','highlight','error','correct');
+    CI(r,c).classList.remove('selected','highlight','same-num','error','correct');
+
   if (!selectedCell) return;
   const {r,c}=selectedCell;
   const sv=userGrid[r][c]||puzzle[r][c];
+
   for (let i=0;i<9;i++) for (let j=0;j<9;j++){
-    const el=cellInp(i,j);
+    const el=CI(i,j);
     const cv=userGrid[i][j]||puzzle[i][j];
-    const sg=i===r||j===c||((0|i/3)===(0|r/3)&&(0|j/3)===(0|c/3));
-    if(sg||(sv&&cv===sv)) el.classList.add('highlight');
+    const sameGroup=i===r||j===c||((0|i/3)===(0|r/3)&&(0|j/3)===(0|c/3));
+    const sameNum=sv&&cv===sv&&!(i===r&&j===c);
+    if (sameNum)      el.classList.add('same-num');
+    else if(sameGroup) el.classList.add('highlight');
   }
-  cellInp(r,c).classList.add('selected');
-  cellInp(r,c).classList.remove('highlight');
+  CI(r,c).classList.add('selected');
+  CI(r,c).classList.remove('highlight','same-num');
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
+   NUMPAD — tükenmiş rakamları gizle
+════════════════════════════════ */
+function updateNumpad() {
+  const count=Array(10).fill(0);
+  for (let r=0;r<9;r++) for (let c=0;c<9;c++){
+    const v=puzzle[r][c]||(userGrid[r][c]===solution[r][c]?userGrid[r][c]:0);
+    if(v) count[v]++;
+  }
+  for (let n=1;n<=9;n++){
+    const btn=document.querySelector(`.num-btn[data-n="${n}"]`);
+    if(count[n]>=9) btn.classList.add('used');
+    else             btn.classList.remove('used');
+  }
+}
+
+/* ════════════════════════════════
    INPUT
-════════════════════════════════════ */
+════════════════════════════════ */
 function inputNum(n) {
   if (!selectedCell||gameOver) return;
   const {r,c}=selectedCell;
   if (puzzle[r][c]) return;
-  if (n===0){ userGrid[r][c]=0; notes[r][c]=Array(10).fill(false); renderBoard(); selectCell(r,c); return; }
+
+  if (n===0){
+    userGrid[r][c]=0; notes[r][c]=Array(10).fill(false);
+    renderBoard(); selectCell(r,c); return;
+  }
   if (notesMode){
     notes[r][c][n]=!notes[r][c][n];
     if(userGrid[r][c]) userGrid[r][c]=0;
     renderBoard(); selectCell(r,c); return;
   }
+
   notes[r][c]=Array(10).fill(false);
+
   if (n===solution[r][c]){
     userGrid[r][c]=n; clearPeerNotes(r,c,n);
-    renderBoard(); selectCell(r,c); checkWin();
+    correctCount++;
+    renderBoard(); selectCell(r,c);
+    // milestone mesajları
+    const total=81-countGivens();
+    if (correctCount===Math.floor(total*0.5)) showToast(rnd(MILESTONE_MSGS));
+    else if (correctCount===Math.floor(total*0.8)) showToast('Az kaldı Mediha Nur! 🌸✨');
+    checkWin();
   } else {
     userGrid[r][c]=n; renderBoard();
-    cellInp(r,c).classList.add('error');
+    CI(r,c).classList.add('error');
     mistakes++;
     document.getElementById('mistakeBox').textContent=`❌ ${mistakes}/3`;
-    showToast('Yanlış! Tekrar dene 🌸');
+    showToast(rnd(WRONG_MSGS));
     setTimeout(()=>{ userGrid[r][c]=0; renderBoard(); selectCell(r,c); },800);
     if(mistakes>=3) setTimeout(()=>loseGame(),900);
   }
 }
+
+function countGivens(){
+  let g=0;
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++)if(puzzle[r][c])g++;
+  return g;
+}
+
 function clearPeerNotes(r,c,n){
   for(let i=0;i<9;i++){notes[r][i][n]=false;notes[i][c][n]=false;}
   const br=(0|r/3)*3,bc=(0|c/3)*3;
   for(let i=0;i<3;i++)for(let j=0;j<3;j++)notes[br+i][bc+j][n]=false;
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    WIN / LOSE
-════════════════════════════════════ */
+════════════════════════════════ */
 function checkWin(){
   for(let r=0;r<9;r++)for(let c=0;c<9;c++)
     if((userGrid[r][c]||puzzle[r][c])!==solution[r][c])return;
@@ -647,13 +665,15 @@ function checkWin(){
   const m=(0|seconds/60).toString().padStart(2,'0');
   const s=(seconds%60).toString().padStart(2,'0');
   document.getElementById('winEmoji').textContent=difficulty==='extreme'?'🏆':'🎉';
+  document.getElementById('winSub').textContent=rnd(WIN_SUBS);
   document.getElementById('winMsg').textContent=
-    `${DIFF_EMOJI[difficulty]} ${DIFF_LABEL[difficulty]} seviyesini ${m}:${s} sürede tamamladın! 💕`;
+    `${DIFF_EMOJI[difficulty]} ${DIFF_LABEL[difficulty]} — ${m}:${s} sürede tamamladın! 💕`;
   document.getElementById('winOverlay').classList.add('show');
 }
+
 function loseGame(){
   gameOver=true; clearInterval(timerInterval);
-  showToast('Oyun bitti! 3 hata yaptın 😢');
+  showToast('Üzme kendini Mediha Nur! 3 hata 💕 Tekrar dene!');
   setTimeout(()=>{
     for(let r=0;r<9;r++)for(let c=0;c<9;c++)
       if(!puzzle[r][c]) userGrid[r][c]=solution[r][c];
@@ -661,24 +681,25 @@ function loseGame(){
   },1200);
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    CHECK BUTTON
-════════════════════════════════════ */
+════════════════════════════════ */
 function checkAll(){
-  if(gameOver)return;
+  if(gameOver) return;
+  let hasError=false;
   for(let r=0;r<9;r++)for(let c=0;c<9;c++){
     if(!puzzle[r][c]&&userGrid[r][c]){
-      if(userGrid[r][c]===solution[r][c]) cellInp(r,c).classList.add('correct');
-      else cellInp(r,c).classList.add('error');
+      if(userGrid[r][c]===solution[r][c]) CI(r,c).classList.add('correct');
+      else { CI(r,c).classList.add('error'); hasError=true; }
     }
   }
-  showToast('Hatalar işaretlendi 🔍');
+  showToast(hasError?'Bazı hatalar var Mediha Nur! 🔍':'Şimdiye kadar hepsi doğru! 🌸');
   setTimeout(()=>{ renderBoard(); if(selectedCell)updateHL(); },1500);
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    TIMER
-════════════════════════════════════ */
+════════════════════════════════ */
 function startTimer(){
   clearInterval(timerInterval); seconds=0; tickTimer();
   timerInterval=setInterval(()=>{ if(!gameOver){seconds++;tickTimer();} },1000);
@@ -689,22 +710,22 @@ function tickTimer(){
   document.getElementById('timer').textContent=`⏱ ${m}:${s}`;
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    TOAST
-════════════════════════════════════ */
+════════════════════════════════ */
 let _tt;
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
-  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),2300);
+  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    GAME FLOW
-════════════════════════════════════ */
+════════════════════════════════ */
 function startGame(diff){
-  difficulty=diff;
-  gameOver=false; mistakes=0; selectedCell=null; notesMode=false;
+  difficulty=diff; gameOver=false; mistakes=0;
+  selectedCell=null; notesMode=false; correctCount=0;
   document.getElementById('notesToggle').classList.remove('on');
   document.getElementById('mistakeBox').textContent='❌ 0/3';
   document.getElementById('winOverlay').classList.remove('show');
@@ -712,25 +733,27 @@ function startGame(diff){
   badge.textContent=`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]}`;
   badge.className=`game-diff-badge badge-${diff}`;
   showScreen('gameScreen');
-  showToast('Hazırlanıyor... 🌸');
+  showToast('Hazırlanıyor Mediha Nur... 🌸');
   setTimeout(()=>{
     solution=generateSolved();
     puzzle=makePuzzle(solution,REMOVALS[diff]);
     userGrid=Array.from({length:9},()=>Array(9).fill(0));
     notes=Array.from({length:9},()=>Array.from({length:9},()=>Array(10).fill(false)));
     renderBoard(); startTimer();
-    showToast(`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]} başladı! 🌸`);
+    showToast(`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]} başladı! Hadi Mediha Nur! 🌸`);
   },80);
 }
+
 function goToMenu(){
   clearInterval(timerInterval);
   document.getElementById('winOverlay').classList.remove('show');
   showScreen('menuScreen');
+  document.getElementById('menuGreeting').textContent=rnd(GREETINGS);
 }
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    KEYBOARD (masaüstü)
-════════════════════════════════════ */
+════════════════════════════════ */
 document.addEventListener('keydown',e=>{
   if(!selectedCell)return;
   const {r,c}=selectedCell;
@@ -744,15 +767,15 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    EVENTS
-════════════════════════════════════ */
+════════════════════════════════ */
 document.querySelectorAll('.diff-card').forEach(card=>{
-  card.addEventListener('pointerdown',e=>{e.preventDefault();startGame(card.dataset.diff);});
+  card.addEventListener('pointerdown',e=>{ e.preventDefault(); startGame(card.dataset.diff); });
 });
 document.getElementById('numpad').addEventListener('pointerdown',e=>{
   const btn=e.target.closest('.num-btn');
-  if(btn){e.preventDefault();inputNum(parseInt(btn.dataset.n));}
+  if(btn&&!btn.classList.contains('used')){ e.preventDefault(); inputNum(parseInt(btn.dataset.n)); }
 });
 document.getElementById('newGameBtn').addEventListener('click',()=>startGame(difficulty));
 document.getElementById('checkBtn').addEventListener('click',checkAll);
@@ -764,10 +787,11 @@ document.getElementById('notesToggle').addEventListener('click',()=>{
   document.getElementById('notesToggle').classList.toggle('on',notesMode);
 });
 
-/* ════════════════════════════════════
+/* ════════════════════════════════
    INIT
-════════════════════════════════════ */
+════════════════════════════════ */
 buildBoard();
+document.getElementById('menuGreeting').textContent=rnd(GREETINGS);
 </script>
 </body>
 </html>
