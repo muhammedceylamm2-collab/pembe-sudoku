@@ -119,6 +119,23 @@
       font-size: clamp(0.75rem, 3vw, 0.88rem); white-space: nowrap;
     }
 
+    /* puan şeridi — tahtanın üstünde tam genişlik */
+    .score-bar {
+      width: 100%; max-width: var(--board-w);
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      border: 2px solid #f472b6; border-radius: 12px;
+      padding: 6px 14px; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
+    }
+    .score-label { color: #be185d; font-size: clamp(0.75rem,3vw,0.85rem); font-weight: 600; }
+    .score-value {
+      color: #be185d; font-size: clamp(1rem,4vw,1.2rem); font-weight: 900;
+      transition: transform .15s;
+    }
+    .score-value.bump { transform: scale(1.25); }
+    .score-hint { color: #db7aa0; font-size: clamp(0.65rem,2.5vw,0.75rem); }
+
     .top-bar {
       display: flex; align-items: center; justify-content: center;
       gap: 6px; margin-bottom: 10px; flex-wrap: wrap;
@@ -261,6 +278,9 @@
     .win-card h2     { color:#be185d; font-size:clamp(1.3rem,6vw,2rem); margin-bottom:6px; }
     .win-card .win-sub { color:#be185d; font-size:clamp(0.85rem,3.5vw,1rem); font-weight:700; margin-bottom:6px; }
     .win-card p      { color:#e06090; font-size:clamp(0.8rem,3vw,1rem); margin-bottom:16px; }
+    .win-score-wrap { margin-bottom: 14px; }
+    .win-score-num  { font-size:clamp(1.8rem,8vw,2.4rem); font-weight:900; color:#be185d; }
+    .win-score-txt  { font-size:0.8rem; color:#db7aa0; margin-top:2px; }
     .win-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
     @supports (padding: env(safe-area-inset-bottom)) {
@@ -333,6 +353,13 @@
     <button class="btn" id="newGameBtn">Yeni Oyun</button>
   </div>
 
+  <!-- Puan şeridi -->
+  <div class="score-bar">
+    <span class="score-label">⭐ Puan</span>
+    <span class="score-value" id="scoreValue">0</span>
+    <span class="score-hint" id="scoreHint"></span>
+  </div>
+
   <div class="board-wrap">
     <table id="board"></table>
   </div>
@@ -372,6 +399,10 @@
     <span class="win-emoji" id="winEmoji">🎉</span>
     <h2>Tebrikler Mediha Nur!</h2>
     <p class="win-sub" id="winSub"></p>
+    <div class="win-score-wrap">
+      <div class="win-score-num" id="winScoreNum"></div>
+      <div class="win-score-txt" id="winScoreTxt"></div>
+    </div>
     <p id="winMsg"></p>
     <div class="win-btns">
       <button class="btn" id="winNewGame">Yeni Oyun</button>
@@ -470,11 +501,14 @@ function countSol(g,lim){
 const REMOVALS  ={easy:36,medium:46,hard:54,extreme:62};
 const DIFF_LABEL={easy:'Kolay',medium:'Orta',hard:'Zor',extreme:'Ekstrem'};
 const DIFF_EMOJI={easy:'🌱',medium:'🌷',hard:'🎀',extreme:'👑'};
+const POINTS    ={easy:10,medium:20,hard:35,extreme:60};
+const PENALTY   ={easy:20,medium:40,hard:70,extreme:120};
 
 let solution,puzzle,userGrid,notes;
 let selectedCell=null,mistakes=0,timerInterval=null,seconds=0;
 let notesMode=false,difficulty='easy',gameOver=false,correctCount=0;
 let history=[]; // geri al geçmişi
+let score=0;
 
 /* ════════════════════════════════
    SCREENS
@@ -615,6 +649,8 @@ function inputNum(n){
   if(n===solution[r][c]){
     userGrid[r][c]=n; clearPeerNotes(r,c,n);
     correctCount++;
+    score+=POINTS[difficulty];
+    updateScore(`+${POINTS[difficulty]}`);
     renderBoard(); selectCell(r,c);
     const total=81-countGivens();
     if(correctCount===Math.floor(total*0.5)) showToast(rnd(MILESTONE_MSGS));
@@ -624,6 +660,8 @@ function inputNum(n){
     userGrid[r][c]=n; renderBoard();
     CI(r,c).classList.add('error');
     mistakes++;
+    score=Math.max(0,score-PENALTY[difficulty]);
+    updateScore(`-${PENALTY[difficulty]}`);
     document.getElementById('mistakeBox').textContent=`❌ ${mistakes}/3`;
     showToast(rnd(WRONG_MSGS));
     setTimeout(()=>{userGrid[r][c]=0; renderBoard(); selectCell(r,c);},800);
@@ -651,10 +689,15 @@ function checkWin(){
   gameOver=true; clearInterval(timerInterval);
   const m=(0|seconds/60).toString().padStart(2,'0');
   const s=(seconds%60).toString().padStart(2,'0');
+  const maxScore=(81-countGivens())*POINTS[difficulty];
+  const pct=score/maxScore;
+  const stars=pct>=0.8?'⭐⭐⭐':pct>=0.5?'⭐⭐':'⭐';
   document.getElementById('winEmoji').textContent=difficulty==='extreme'?'🏆':'🎉';
   document.getElementById('winSub').textContent=rnd(WIN_SUBS);
+  document.getElementById('winScoreNum').textContent=`${stars} ${score.toLocaleString()} puan`;
+  document.getElementById('winScoreTxt').textContent=`(${DIFF_LABEL[difficulty]} · ${mistakes} hata)`;
   document.getElementById('winMsg').textContent=
-    `${DIFF_EMOJI[difficulty]} ${DIFF_LABEL[difficulty]} — ${m}:${s} sürede tamamladın! 💕`;
+    `${DIFF_EMOJI[difficulty]} ${m}:${s} sürede tamamladın! 💕`;
   document.getElementById('winOverlay').classList.add('show');
 }
 function loseGame(){
@@ -681,6 +724,24 @@ function checkAll(){
   }
   showToast(hasError?'Bazı hatalar var Mediha Nur! 🔍':'Şimdiye kadar hepsi doğru! 🌸');
   setTimeout(()=>{renderBoard(); if(selectedCell)updateHL();},1500);
+}
+
+/* ════════════════════════════════
+   SKOR
+════════════════════════════════ */
+let _bumpT;
+function updateScore(hint){
+  const el=document.getElementById('scoreValue');
+  el.textContent=score.toLocaleString();
+  document.getElementById('scoreHint').textContent=hint;
+  el.classList.remove('bump');
+  void el.offsetWidth; // reflow
+  el.classList.add('bump');
+  clearTimeout(_bumpT);
+  _bumpT=setTimeout(()=>{
+    el.classList.remove('bump');
+    document.getElementById('scoreHint').textContent=`+${POINTS[difficulty]} / -${PENALTY[difficulty]}`;
+  },400);
 }
 
 /* ════════════════════════════════
@@ -711,9 +772,11 @@ function showToast(msg){
 ════════════════════════════════ */
 function startGame(diff){
   difficulty=diff; gameOver=false; mistakes=0;
-  selectedCell=null; notesMode=false; correctCount=0; history=[];
+  selectedCell=null; notesMode=false; correctCount=0; history=[]; score=0;
   document.getElementById('notesToggle').classList.remove('on');
   document.getElementById('mistakeBox').textContent='❌ 0/3';
+  document.getElementById('scoreValue').textContent='0';
+  document.getElementById('scoreHint').textContent=`+${POINTS[diff]} / -${PENALTY[diff]}`;
   document.getElementById('winOverlay').classList.remove('show');
   const badge=document.getElementById('diffBadge');
   badge.textContent=`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]}`;
