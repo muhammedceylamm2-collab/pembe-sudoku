@@ -286,6 +286,24 @@
     @supports (padding: env(safe-area-inset-bottom)) {
       body { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
     }
+
+    /* ════════ ŞAKA POPUP ════════ */
+    .joke-overlay {
+      display:none; position:fixed; inset:0;
+      background:#00000077; backdrop-filter:blur(4px);
+      align-items:center; justify-content:center; z-index:500; padding:16px;
+    }
+    .joke-overlay.show { display:flex; }
+    .joke-card {
+      background:#fff0f7; border:4px solid #f472b6; border-radius:22px;
+      padding:clamp(22px,6vw,38px) clamp(18px,7vw,46px);
+      text-align:center; box-shadow:0 12px 40px #f9a8d460; max-width:92vw;
+      animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .joke-emoji-big { font-size:clamp(2.2rem,10vw,3rem); display:block; margin-bottom:10px; }
+    .joke-msg { color:#be185d; font-size:clamp(0.9rem,4vw,1.15rem); font-weight:800; line-height:1.6; margin-bottom:20px; }
+    .joke-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
   </style>
 </head>
 <body>
@@ -393,6 +411,19 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- ŞAKA POPUP -->
+<div class="joke-overlay" id="jokeOverlay">
+  <div class="joke-card">
+    <span class="joke-emoji-big">🍖</span>
+    <div class="joke-msg">yapamıyorsan sil oyunu<br>git köfteyle ilgilen 😂</div>
+    <div class="joke-btns">
+      <button class="btn" id="jokeYes">Tamam 😔</button>
+      <button class="btn btn-ghost" id="jokeNo">Olmaz! 😤</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- WIN OVERLAY -->
 <div class="win-overlay" id="winOverlay">
   <div class="win-card">
@@ -435,6 +466,7 @@ const MILESTONE_MSGS = [
   "Bravo Mediha Nur! 🌷",
   "Çok iyi! Neredeyse bitti! ✨",
 ];
+
 const WIN_SUBS = [
   "Zihninle bizi büyülemeye devam et! 🌷",
   "Senden daha zeki kimse yok! 💕",
@@ -509,6 +541,7 @@ let selectedCell=null,mistakes=0,timerInterval=null,seconds=0;
 let notesMode=false,difficulty='easy',gameOver=false,correctCount=0;
 let history=[]; // geri al geçmişi
 let score=0;
+let jokeShown=false;
 
 /* ════════════════════════════════
    SCREENS
@@ -653,7 +686,10 @@ function inputNum(n){
     updateScore(`+${POINTS[difficulty]}`);
     renderBoard(); selectCell(r,c);
     const total=81-countGivens();
-    if(correctCount===Math.floor(total*0.5)) showToast(rnd(MILESTONE_MSGS));
+    if(!jokeShown&&correctCount===Math.max(1,Math.floor(total*0.1))){
+      jokeShown=true;
+      setTimeout(()=>document.getElementById('jokeOverlay').classList.add('show'),400);
+    } else if(correctCount===Math.floor(total*0.5)) showToast(rnd(MILESTONE_MSGS));
     else if(correctCount===Math.floor(total*0.8)) showToast('Az kaldı Mediha Nur! 🌸✨');
     checkWin();
   } else {
@@ -778,6 +814,8 @@ function startGame(diff){
   document.getElementById('scoreValue').textContent='0';
   document.getElementById('scoreHint').textContent=`+${POINTS[diff]} / -${PENALTY[diff]}`;
   document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('jokeOverlay').classList.remove('show');
+  jokeShown=false;
   const badge=document.getElementById('diffBadge');
   badge.textContent=`${DIFF_EMOJI[diff]} ${DIFF_LABEL[diff]}`;
   badge.className=`game-diff-badge badge-${diff}`;
@@ -836,6 +874,13 @@ document.getElementById('winMenu').addEventListener('click',goToMenu);
 document.getElementById('notesToggle').addEventListener('click',()=>{
   notesMode=!notesMode;
   document.getElementById('notesToggle').classList.toggle('on',notesMode);
+});
+document.getElementById('jokeYes').addEventListener('click',()=>{
+  document.getElementById('jokeOverlay').classList.remove('show');
+  goToMenu();
+});
+document.getElementById('jokeNo').addEventListener('click',()=>{
+  document.getElementById('jokeOverlay').classList.remove('show');
 });
 
 /* ════════════════════════════════
